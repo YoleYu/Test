@@ -4,47 +4,58 @@
  */
 package test.thread;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.junit.Test;
+
+import test.Util;
 
 public class Main {
     public static int LOOP_TIMES = 10;
     
     public static void main(String[] args) {
-        new Main().UN_ORDERED_EXECUATE();
+        Main test = new Main();
+        test.UN_ORDERED_EXECUATE();
     }
 
-    @Test
+    //@Test junit CAN'T support multiple thread test
+    // it use System.exit() to end the program.
+    // http://groboutils.sourceforge.net plugin for junit thread test
     public void UN_ORDERED_EXECUATE(){
         Thread1 t1 = new Thread1();
         
         Thread2 runnable = new Thread2();
-        Thread t2 = new Thread(runnable);
+        Thread t2 = new Thread(runnable, "Thread2");
         
         t1.start();
         t2.start();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            //  Auto-generated catch block
-            e.printStackTrace();
+        
+        Util.sleep(30);
+        for(int i=0; i < LOOP_TIMES; i++){
+            System.out.println("Main :" + Util.getTime());
         }
+    }
+
+    public void JOIN(){
+        Thread2 runnable = new Thread2();
+        Thread t1 = new Thread(runnable, "First Thread");
+        Thread t2 = new Thread(runnable, "Second Thread");
+    }
+
+    @Test
+    public void test(){
+        int[] a = new int[1],
+              b = new int[1],
+              c = new int[1];
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println(c);
     }
 }
 
 class Thread1 extends Thread {
     public void run() {
         for (int i = 0; i < Main.LOOP_TIMES; i++) {
-            DateFormat df = new SimpleDateFormat("yy/MM/dd HH:mm:ss SS");
-            System.out.println("Thread1 :" + df.format(new java.util.Date()));
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            System.out.println(getName() + " : " + Util.getTime());
+            Util.sleep(10);
         }
     }
 }
@@ -54,14 +65,8 @@ class Thread2 implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < Main.LOOP_TIMES; i++) {
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss SS");
-            System.out.println("Thread2 :" + df.format(new java.util.Date()));
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            System.out.println(Thread.currentThread().getName() + " : " + Util.getTime());
+            Util.sleep(10);
         }
     }
 
